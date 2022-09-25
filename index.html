@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ColaCola</title>
+    </head>
+    <body>
+        <div class="wrapper">
+            <header class="header-cont">
+                <h1 class="header-logo">
+                    <img src="assets/header-logo.png" alt="ColaCola" />
+                </h1>
+            </header>
+            <main class="main-cont">
+                <!-- 음료 판매 영역 -->
+                <section class="product-info">
+                    <h2 class="screen-out">음료 자판기</h2>
+
+                    <div class="product-info-content product">
+                        <h3 class="screen-out">음료 판매 목록</h3>
+                        <ul class="product-list">
+                            <!-- 음료 품절 시 : .product-item 에 is-soldout 클래스 추가 -->
+                            <li class="product-item">
+                                <button type="button">
+                                    <img class="img" src="assets/cola-original.svg" alt="" />
+                                    <strong class="name">Original_Cola</strong>
+                                    <span class="price">1000원</span>
+                                </button>
+                            </li>
+                            <li class="product-item is-soldout" aria-label="품절">
+                                <button type="button" disabled>
+                                    <img class="img" src="assets/cola-violet.svg" alt="" />
+                                    <strong class="name">Violet_Cola</strong>
+                                    <span class="price">1000원</span>
+                                </button>
+                            </li>
+                            <li class="product-item">
+                                <button type="button">
+                                    <img class="img" src="assets/cola-yellow.svg" alt="" />
+                                    <strong class="name">Yellow_Cola</strong>
+                                    <span class="price">1000원</span>
+                                </button>
+                            </li>
+                            <li class="product-item">
+                                <button type="button">
+                                    <img class="img" src="assets/cola-cool.svg" alt="" />
+                                    <strong class="name">Cool_Cola</strong>
+                                    <span class="price">1000원</span>
+                                </button>
+                            </li>
+                            <li class="product-item">
+                                <button type="button">
+                                    <img class="img" src="assets/cola-green.svg" alt="" />
+                                    <strong class="name">Green_Cola</strong>
+                                    <span class="price">1000원</span>
+                                </button>
+                            </li>
+                            <li class="product-item">
+                                <button type="button">
+                                    <img class="img" src="assets/cola-orange.svg" alt="" />
+                                    <strong class="name">Orange_Cola</strong>
+                                    <span class="price">1000원</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="product-info-content counter">
+                        <h3 class="screen-out">계산대</h3>
+
+                        <div class="txt-change">잔액 : <span>0 원</span></div>
+                        <button class="btn-return" type="button">거스름돈 반환</button>
+
+                        <label class="screen-out" for="inputDeposit">입금액</label>
+                        <input class="input-deposit" type="number" id="inputDeposit" placeholder="입금액 입력" />
+                        <button class="btn-insert" type="button">입금</button>
+
+                        <span class="screen-out" aria-label="선택한 음료 목록"></span>
+                        <div class="checkout">
+                            <ul class="checkout-list">
+                                <li class="checkout-item" data-type="original">
+                                    <img class="img" src="assets/cola-original.svg" alt="" />
+                                    <strong class="name">Original_Cola</strong>
+                                    <span class="count" aria-label="1개">1</span>
+                                    <button class="btn-delete" type="button" aria-label="음료 삭제하기"></button>
+                                </li>
+                                <li class="checkout-item" data-type="original">
+                                    <img class="img" src="assets/cola-green.svg" alt="" />
+                                    <strong class="name">Green_Cola</strong>
+                                    <span class="count" aria-label="2개">2</span>
+                                    <button class="btn-delete" type="button" aria-label="음료 삭제하기"></button>
+                                </li>
+                                <li class="checkout-item" data-type="original">
+                                    <img class="img" src="assets/cola-orange.svg" alt="" />
+                                    <strong class="name">Orange-Cola</strong>
+                                    <span class="count" aria-label="1개">1</span>
+                                    <button class="btn-delete" type="button" aria-label="음료 삭제하기"></button>
+                                </li>
+                                <li class="checkout-item" data-type="original">
+                                    <img class="img" src="assets/cola-violet.svg" alt="" />
+                                    <strong class="name">Violet_Cola</strong>
+                                    <span class="count" aria-label="5개">5</span>
+                                    <button class="btn-delete" type="button" aria-label="음료 삭제하기"></button>
+                                </li>
+                            </ul>
+                        </div>
+                        <button class="btn-get" type="button">획득</button>
+                    </div>
+                </section>
+                <!-- //음료 판매 영역 -->
+
+                <!-- 주문 정보 영역 -->
+                <section class="order-info">
+                    <h2 class="screen-out">주문 정보</h2>
+
+                    <div class="order-info-content wallet">
+                        <h3 class="screen-out">나의 소지금</h3>
+                        <div class="txt-wallet">소지금: <span>0 원</span></div>
+                    </div>
+
+                    <div class="order-info-content ordered">
+                        <h3 class="ordered-title">획득한 음료</h3>
+
+                        <div class="checkout">
+                            <ul class="checkout-list">
+                                <li class="checkout-item" data-type="original">
+                                    <img class="img" src="assets/cola-original.svg" alt="" />
+                                    <strong class="name">Original_Cola</strong>
+                                    <span class="count" aria-label="1개">1</span>
+                                </li>
+                                <li class="checkout-item" data-type="original">
+                                    <img class="img" src="assets/cola-green.svg" alt="" />
+                                    <strong class="name">Green_Cola</strong>
+                                    <span class="count" aria-label="2개">2</span>
+                                </li>
+                                <li class="checkout-item" data-type="original">
+                                    <img class="img" src="assets/cola-orange.svg" alt="" />
+                                    <strong class="name">Orange-Cola</strong>
+                                    <span class="count" aria-label="1개">1</span>
+                                </li>
+                                <li class="checkout-item" data-type="original">
+                                    <img class="img" src="assets/cola-violet.svg" alt="" />
+                                    <strong class="name">Violet_Cola</strong>
+                                    <span class="count" aria-label="5개">5</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <strong class="ordered-total">총금액 : <span>0 원</span></strong>
+                    </div>
+                </section>
+                <!-- //주문 정보 영역 -->
+            </main>
+        </div>
+    </body>
+</html>
