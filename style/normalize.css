@@ -347,3 +347,26 @@
   [hidden] {
     display: none;
   }
+
+  /** 
+   * Custom
+   */
+   h1, h2, h3, ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    list-style: none;
+  }
+
+  button {
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    background-color: transparent;
+  }
+
+  button:disabled {
+    cursor: auto;
+  }
