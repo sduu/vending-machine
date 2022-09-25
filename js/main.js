@@ -1,213 +1,237 @@
 // 금액에서 콤마를 제거하는 함수
-function removeComma(str) {
+const removeComma = function (str) {
     const number = parseInt(str.replace(',', ''));
     return number;
-}
+};
 
 // 숫자에 콤마를 추가하는 함수
-function addComma(num) {
+const addComma = function (num) {
     const money = parseInt(num).toLocaleString();
     return money;
-}
+};
 
 const productData = [
-    {name: 'Original_Cola', type: 'cola-original', price: '1000', stock: '3', basket: 0},
-    {name: 'Violet_Cola', type: 'cola-violet', price: '1000', stock: '3', basket: 0},
-    {name: 'Yellow_Cola', type: 'cola-yellow', price: '1000', stock: '3', basket: 0},
-    {name: 'Cool_Cola', type: 'cola-cool', price: '1000', stock: '3', basket: 0},
-    {name: 'Green_Cola', type: 'cola-green', price: '1000', stock: '3', basket: 0},
-    {name: 'Orange_Cola', type: 'cola-orange', price: '1000', stock: '3', basket: 0},
+    {name: 'Original_Cola', type: 'cola-original', price: '1000', stock: '3'},
+    {name: 'Violet_Cola', type: 'cola-violet', price: '1000', stock: '3'},
+    {name: 'Yellow_Cola', type: 'cola-yellow', price: '1000', stock: '3'},
+    {name: 'Cool_Cola', type: 'cola-cool', price: '1000', stock: '3'},
+    {name: 'Green_Cola', type: 'cola-green', price: '1000', stock: '3'},
+    {name: 'Orange_Cola', type: 'cola-orange', price: '1000', stock: '3'},
 ];
 
-const change = document.querySelector('.txt-change span');
-const deposit = document.querySelector('.input-deposit');
-const wallet = document.querySelector('.txt-wallet span');
-const total = document.querySelector('.ordered-total span');
+const changeEl = document.querySelector('.txt-change span');
+const walletEl = document.querySelector('.txt-wallet span');
+const totalEl = document.querySelector('.ordered-total span');
 const returnButton = document.querySelector('.btn-return');
 const insetButton = document.querySelector('.btn-insert');
 const getButton = document.querySelector('.btn-get');
-const productList = document.querySelector('.product .product-list');
-const orderedList = document.querySelector('.ordered .checkout-list');
-const counterList = document.querySelector('.counter .checkout-list');
+const cartList = document.querySelector('.counter .checkout-list');
 
-let productListItems;
-let depositValue;
-let walletValue;
-let changeValue;
-let totalAmount = 0;
+let walletVal = 5000;
+let changeVal = 0;
+let totalVal = 0;
+let cartVal = 0;
 
-initProduct(productData);
-initWallet(5000);
+let productItems = [];
+let cartItems = [];
 
-// 판매중인 제품 목록 초기화
-function initProduct(productData) {
-    productData.forEach(data => {
-        /* insertAdjacentHTML vs appendChild */
-        productList.insertAdjacentHTML('beforeend', createProductItem(data));
+// 음료 데이터로 요소 생성
+class Product {
+    constructor(el, data) {
+        this.productList = el;
+        this.data = {...data};
+
+        this.createProductItem();
+    }
+
+    createProductItem() {
+        const li = document.createElement('li');
+        li.classList.add('product-item');
+        li.setAttribute('data-type', this.data.type);
+        li.innerHTML = `
+            <button type="button">
+                <img class="img" src="assets/${this.data.type}.svg" alt="" />
+                <strong class="name">${this.data.name}</strong>
+                <span class="price">${this.data.price}원</span>
+            </button>
+        `;
+        this.productItem = li;
+        this.productList.appendChild(this.productItem);
+    }
+
+    setSoldout() {
+        this.productItem.classList.add('is-soldout');
+        this.productItem.querySelector('button').disabled = true;
+    }
+}
+
+// 장바구니 아이템 요소 생성
+class Cart {
+    constructor(el, data) {
+        this.cartList = el;
+        this.data = {...data};
+
+        this.createCartItem();
+    }
+
+    createCartItem() {
+        const li = document.createElement('li');
+        li.classList.add('checkout-item');
+        li.setAttribute('data-type', this.data.type);
+        li.innerHTML = `
+            <img class="img" src="assets/${this.data.type}.svg" alt="" />
+            <strong class="name">${this.data.name}</strong>
+            <span class="count" aria-label="${this.data.num}개">${this.data.num}</span>
+            <button class="btn-delete" type="button" aria-label="음료 삭제하기"></button>
+        `;
+        this.cartItem = li;
+        this.cartList.appendChild(this.cartItem);
+    }
+
+    updateItem() {
+        this.cartItem.setAttribute('aria-label', `${this.data.num}개`);
+        this.cartItem.querySelector('.count').innerText = this.data.num;
+    }
+}
+
+// 초기화
+initProductList();
+setInnerText();
+bindEvent();
+
+// 음료 판매 리스트 추가
+function initProductList() {
+    const productList = document.querySelector('.product .product-list');
+    productData.forEach(data => productItems.push(new Product(productList, data)));
+}
+
+// 이벤트 바인딩
+function bindEvent() {
+    returnButton.addEventListener('click', returnMoney);
+    insetButton.addEventListener('click', insertMoney);
+    getButton.addEventListener('click', getProduct);
+    productItems.forEach(item => {
+        item.productItem.addEventListener('click', () => addCart(item));
     });
-    productListItems = productList.querySelectorAll('.product-item');
 }
 
-// 제품 목록 아이템 생성
-function createProductItem(data) {
-    return `
-    <li class="product-item" data-type=${data.type}>
-        <button type="button" >
-            <img class="img" src="assets/${data.type}.svg" alt="" />
-            <strong class="name">${data.name}</strong>
-            <span class="price">${data.price}원</span>
-        </button>
-    </li>
-    `;
+// 입력 값을 금액에 업데이트
+function setInnerText() {
+    walletEl.innerText = `${addComma(walletVal)} 원`;
+    changeEl.innerText = `${addComma(changeVal)} 원`;
+    totalEl.innerText = `${addComma(totalVal)} 원`;
 }
 
-// 소지금 초기화
-function initWallet(money = 0) {
-    wallet.innerText = `${addComma(money)} 원`;
-}
-
-insetButton.addEventListener('click', insertMoney);
-returnButton.addEventListener('click', returnMoney);
-getButton.addEventListener('click', getProduct);
-[...productListItems].forEach(function (item) {
-    item.addEventListener('click', addBasket);
-});
-
-// 금액 관련 값 가져오기
-function getCounterValue() {
-    walletValue = removeComma(wallet.innerText);
-    changeValue = removeComma(change.innerText);
-    depositValue = deposit.value;
-}
-
-// 입금 버튼
-function insertMoney() {
-    getCounterValue();
-
-    // 유효성 검사
-    if (depositValue === '') {
-        alert('입금할 금액을 입력해주세요.');
-        deposit.focus();
-        return false;
-    }
-
-    if (walletValue < depositValue) {
-        alert('소지금이 부족합니다.');
-        deposit.focus();
-        return false;
-    }
-
-    change.innerText = `${addComma(changeValue + +depositValue)} 원`;
-    wallet.innerText = `${addComma(walletValue - +depositValue)} 원`;
-    deposit.value = '';
-}
-
-// 거스름돈 반환 버튼
-function returnMoney() {
-    getCounterValue();
-
-    // 유효성 검사
-    if (changeValue === 0) {
+// 음료 클릭
+function addCart(product) {
+    if (changeVal < parseInt(product.data.price)) {
         alert('잔액이 부족합니다.');
         return false;
     }
 
-    change.innerText = `0 원`;
-    wallet.innerText = `${addComma(walletValue + changeValue)} 원`;
-}
+    // 잔액 반영
+    cartVal += parseInt(product.data.price);
+    changeVal -= parseInt(product.data.price);
+    setInnerText();
 
-// 음료 버튼
-function addBasket() {
-    const _this = this;
-    const targetData = productData.filter(function (data) {
-        return data.type === _this.dataset.type;
-    })[0];
+    --product.data.stock;
 
-    targetData.basket === 0 ? initBasketItem('counter', targetData) : addBasketNum('counter', targetData);
-
-    totalAmount += +targetData.price;
-
-    if (targetData.stock === 0) {
-        _this.classList.add('is-soldout');
-        _this.querySelector('button').disabled = true;
-    }
-}
-
-// 장바구니 아이템 개수 증가
-function addBasketNum(list, data) {
-    if (list == 'ordered') {
-        const ordered = orderedList.querySelector(`[data-type=${data.type}]`);
-        const before = parseInt(ordered.querySelector('.count').innerText);
-        ordered.setAttribute('aria-label', `${before + data.basket}개`);
-        ordered.querySelector('.count').innerText = before + data.basket;
+    // 장바구니 리스트 업데이트
+    // TODO : find() 보다 좋은 방법이 있는지 찾아보기
+    const cartItem = cartItems.find(item => item.data.type === product.data.type);
+    if (!cartItem) {
+        const data = {
+            name: product.data.name,
+            type: product.data.type,
+            num: 1,
+        };
+        const item = new Cart(cartList, data);
+        cartItems.push(item);
+        // TODO : 동적으로 생성된 요소에 이벤트 바인딩 하는 방법 찾아보기
+        // item.cartItem.querySelector('.btn-delete').addEventListener('click', deleteCart);
     } else {
-        const checkout = counterList.querySelector(`[data-type=${data.type}]`);
-        data.basket++;
-        data.stock--;
-        checkout.setAttribute('aria-label', `${data.basket}개`);
-        checkout.querySelector('.count').innerText = data.basket;
+        cartItem.data.num++;
+        cartItem.updateItem();
+    }
+
+    // 재고 소진 시 품절 표시
+    if (product.data.stock === 0) {
+        product.setSoldout();
     }
 }
 
-// 장바구니 아이템 추가
-function initBasketItem(list, data) {
-    if (list == 'ordered') {
-        orderedList.insertAdjacentHTML('beforeend', createBasketItem(data));
-    } else {
-        data.basket++;
-        data.stock--;
-        counterList.insertAdjacentHTML('beforeend', createBasketItem(data));
+// 입금 버튼
+function insertMoney() {
+    const depositInput = document.querySelector('.input-deposit');
+    const depositVal = +depositInput.value;
+
+    // 유효성 검사
+    if (depositVal === 0) {
+        alert('입금할 금액을 입력해주세요.');
+        depositInput.focus();
+        return false;
     }
+
+    if (walletVal < depositVal) {
+        alert('소지금이 부족합니다.');
+        depositInput.focus();
+        return false;
+    }
+
+    changeVal += depositVal;
+    walletVal -= depositVal;
+    depositInput.value = '';
+    setInnerText();
 }
 
-// 장바구니 아이템 생성
-function createBasketItem(data) {
-    return `
-    <li class="checkout-item" data-type=${data.type}>
-        <img class="img" src="assets/${data.type}.svg" alt="" />
-        <strong class="name">${data.name}</strong>
-        <span class="count" aria-label="${data.basket}개">${data.basket}</span>
-    </li>
-    `;
+// 거스름돈 반환 버튼
+function returnMoney() {
+    // 유효성 검사
+    if (changeVal === 0) {
+        alert('잔액이 부족합니다.');
+        return false;
+    }
+
+    walletVal += changeVal;
+    changeVal = 0;
+    setInnerText();
 }
 
 // 획득 버튼
 function getProduct() {
-    getCounterValue();
+    const orderedList = document.querySelector('.ordered .checkout-list');
 
-    // 유효성 검사
-    if (totalAmount === 0) {
-        alert('구매하실 음료를 선택해 주세요.');
-        return false;
-    }
-
-    if (changeValue < totalAmount) {
-        alert('잔액이 부족합니다');
-        return false;
-    }
-
-    const orderedData = productData.filter(item => item.basket > 0);
-
-    orderedData.forEach(function (data) {
-        if (orderedList.querySelector(`[data-type=${data.type}]`) !== null) {
-            addBasketNum('ordered', data);
+    // TODO : 반복문을 쓰지 않는 방법이 있을지 찾아보기
+    cartItems.forEach(item => {
+        if (!orderedList.querySelector(`[data-type=${item.data.type}]`)) {
+            const clone = item.cartItem.cloneNode(true);
+            clone.querySelector('button').remove();
+            orderedList.appendChild(clone);
         } else {
-            initBasketItem('ordered', data);
+            const orderedItem = orderedList.querySelector(`[data-type=${item.data.type}]`);
+            const num = parseInt(orderedItem.querySelector('.count').innerText);
+            orderedItem.querySelector('.count').setAttribute('aria-label', `${num + item.data.num} 개`);
+            orderedItem.querySelector('.count').innerText = num + item.data.num;
         }
-    });
 
-    change.innerText = `${addComma(+changeValue - totalAmount)} 원`;
-    addTotalMoney();
+        item.cartItem.remove();
+    });
 
     // 초기화
-    productData.forEach(function (data) {
-        data.basket = 0;
-    });
-    counterList.replaceChildren();
-    totalAmount = 0;
+    cartItems = [];
+
+    // 총금액 반영
+    totalVal += cartVal;
+    cartVal = 0;
+    setInnerText();
 }
 
-function addTotalMoney() {
-    const before = removeComma(total.innerText);
-    total.innerText = `${addComma(before + totalAmount)} 원`;
+// 장바구니에서 삭제
+function deleteCart() {
+    const item = this.parentNode;
+    const index = [...cartList.children].indexOf(item);
+    // TODO : 금액에 반영 하기
+    // TODO : 제품 재고 반영 하기
+    cartItems.splice(index, 1);
+    item.remove();
 }
