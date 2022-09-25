@@ -1,9 +1,3 @@
-// 금액에서 콤마를 제거하는 함수
-const removeComma = function (str) {
-    const number = parseInt(str.replace(',', ''));
-    return number;
-};
-
 // 숫자에 콤마를 추가하는 함수
 const addComma = function (num) {
     const money = parseInt(num).toLocaleString();
