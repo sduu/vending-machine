@@ -54,8 +54,13 @@ class Product {
     }
 
     setSoldout() {
-        this.productItem.classList.add('is-soldout');
-        this.productItem.querySelector('button').disabled = true;
+        if (this.data.stock === 0) {
+            this.productItem.classList.add('is-soldout');
+            this.productItem.querySelector('button').disabled = true;
+        } else {
+            this.productItem.classList.remove('is-soldout');
+            this.productItem.querySelector('button').disabled = false;
+        }
     }
 }
 
@@ -113,7 +118,6 @@ function bindEvent() {
 function setInnerText() {
     walletEl.innerText = `${addComma(walletVal)} 원`;
     changeEl.innerText = `${addComma(changeVal)} 원`;
-    totalEl.innerText = `${addComma(totalVal)} 원`;
 }
 
 // 음료 클릭
@@ -142,7 +146,7 @@ function addCart(product) {
         const item = new Cart(cartList, data);
         cartItems.push(item);
         // TODO : 동적으로 생성된 요소에 이벤트 바인딩 하는 방법 찾아보기
-        // item.cartItem.querySelector('.btn-delete').addEventListener('click', deleteCart);
+        item.cartItem.querySelector('.btn-delete').addEventListener('click', deleteCart);
     } else {
         cartItem.data.num++;
         cartItem.updateItem();
@@ -217,15 +221,25 @@ function getProduct() {
     // 총금액 반영
     totalVal += cartVal;
     cartVal = 0;
-    setInnerText();
+    totalEl.innerText = `${addComma(totalVal)} 원`;
 }
 
 // 장바구니에서 삭제
 function deleteCart() {
-    const item = this.parentNode;
-    const index = [...cartList.children].indexOf(item);
-    // TODO : 금액에 반영 하기
-    // TODO : 제품 재고 반영 하기
+    const li = this.parentNode;
+    const index = [...cartList.children].indexOf(li);
+    // TODO : find() 보다 좋은 방법이 있는지 찾아보기
+    const productItem = productItems.find(item => item.data.type === li.dataset.type);
+
+    // 금액에 반영
+    changeVal += cartItems[index].data.num * productItem.data.price;
+    totalVal -= cartItems[index].data.num * productItem.data.price;
+    setInnerText();
+
+    // 제품 재고애 반영
+    productItem.data.stock += cartItems[index].data.num;
+    productItem.setSoldout();
+
     cartItems.splice(index, 1);
-    item.remove();
+    li.remove();
 }
